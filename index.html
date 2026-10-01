@@ -10,7 +10,7 @@
     :root { color-scheme: light; --ivory:#F3ECE0; --ink:#44372F; --coral:#C77E73; --line:#DCCFC3; --muted:#756A62; }
     * { box-sizing:border-box; }
     body { margin:0; background:var(--ivory); color:var(--ink); font-family:"Yu Gothic UI","Meiryo",sans-serif; }
-    main { width:min(100% - 32px, 620px); margin:0 auto; padding:32px 0 56px; }
+    main { position:relative; width:min(100% - 32px, 620px); margin:0 auto; padding:32px 0 56px; }
     header { border-bottom:1px solid var(--line); padding:8px 0 18px; }
     .brand-row { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:0 0 10px; border-bottom:1px solid var(--line); }
     .eyebrow { margin:0; color:var(--coral); font-size:.7rem; font-weight:700; letter-spacing:.16em; }
@@ -29,6 +29,23 @@
     .links a { display:inline-block; padding:10px 14px; border-radius:999px; background:var(--ink); color:#fff; text-decoration:none; font-size:.84rem; font-weight:700; }
     .links a.secondary { background:var(--coral); }
     .empty { padding:20px; border:1px dashed var(--line); border-radius:12px; color:var(--muted); text-align:center; line-height:1.7; }
+    .product[hidden] { display:none !important; }
+    .calendar-panel { margin:18px 0 0; padding:16px; border:1px solid var(--line); border-radius:14px; background:#fffaf5; box-shadow:0 3px 12px #44372f0b; }
+    .calendar-heading { margin:0 0 12px; font-size:.92rem; font-weight:700; }
+    .calendar-controls { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .calendar-month { font-size:.9rem; font-weight:700; }
+    .calendar-nav { width:30px; height:30px; border:1px solid var(--line); border-radius:50%; background:var(--ivory); color:var(--ink); font:inherit; cursor:pointer; }
+    .calendar-nav:disabled { opacity:.35; cursor:default; }
+    .calendar-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:3px; margin-top:12px; text-align:center; }
+    .calendar-weekday { color:var(--muted); font-size:.72rem; line-height:30px; }
+    .calendar-day { position:relative; width:100%; aspect-ratio:1; border:0; border-radius:50%; background:transparent; color:var(--ink); font:inherit; font-size:.78rem; cursor:pointer; }
+    .calendar-day:disabled { color:#b4aaa2; cursor:default; }
+    .calendar-day[data-has-post="true"]::after { content:""; position:absolute; width:4px; height:4px; left:calc(50% - 2px); bottom:3px; border-radius:50%; background:var(--coral); }
+    .calendar-day[aria-pressed="true"] { background:var(--coral); color:#fff; font-weight:700; }
+    .calendar-day[aria-pressed="true"]::after { background:#fff; }
+    .calendar-day:focus-visible, .calendar-nav:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+    .calendar-selection { margin:12px 0 0; color:var(--muted); font-size:.78rem; line-height:1.5; }
+    @media (min-width:1200px) { .calendar-panel { position:absolute; top:174px; left:calc(100% + 28px); width:248px; margin:0; } }
     footer { margin-top:30px; padding-top:14px; border-top:1px solid var(--line); color:var(--muted); font-size:.75rem; line-height:1.7; }
   </style>
 </head>
@@ -43,11 +60,21 @@
       <p class="intro">動画で紹介したスキンケア・コスメの情報と商品リンクをまとめています。</p>
     </header>
     <p class="disclosure">広告・アフィリエイトリンクを含みます。</p>
+    <aside class="calendar-panel" aria-label="投稿カレンダー" id="calendar-panel" hidden>
+      <p class="calendar-heading">投稿カレンダー</p>
+      <div class="calendar-controls">
+        <button class="calendar-nav" id="calendar-prev" type="button" aria-label="前の月">‹</button>
+        <span class="calendar-month" id="calendar-month" aria-live="polite"></span>
+        <button class="calendar-nav" id="calendar-next" type="button" aria-label="次の月">›</button>
+      </div>
+      <div class="calendar-grid" id="calendar-grid" aria-label="月曜日始まりのカレンダー"></div>
+      <p class="calendar-selection" id="calendar-selection" aria-live="polite"></p>
+    </aside>
     <section aria-labelledby="list-title">
       <h2 id="list-title">商品リンク</h2>
-            <article class="product">
+            <article class="product" data-publish-date="2026-10-04" data-week-start="2026-09-28">
         <div class="product-visual"><img src="product-2026-10-04-laneige-pear-balm.webp" alt="リップグロウィバーム 洋ナシのメーカー公式画像" loading="lazy"></div>
-        <div class="date">10/4分 ｜ 10月5日より順次全国発売</div>
+        <div class="date">10/4投稿 ｜ 10月5日より順次全国発売</div>
         <h3>ラネージュ リップグロウィバーム 洋ナシ</h3>
         <div class="summary">2026年10月5日から順次全国発売。洋ナシの限定フレーバー、10g。EC先行販売中。</div>
         <div class="links" aria-label="LANEIGE の商品リンク">
@@ -55,18 +82,18 @@
         <a class="secondary" href="https://link.amazon/B03A4rnHX" target="_blank" rel="sponsored nofollow noopener">Amazonで見る</a>
         </div>
       </article>
-      <article class="product">
+      <article class="product" data-publish-date="2026-10-03" data-week-start="2026-09-28">
         <div class="product-visual"><img src="product-2026-10-03-suqqu-aqufons-fluid.webp" alt="SUQQU アクフォンス エモリエント フィニッシング フルイドの公式商品画像" loading="lazy"></div>
-        <div class="date">10/3分 ｜ 10月2日発売</div>
+        <div class="date">10/3投稿 ｜ 10月2日発売</div>
         <h3>SUQQU アクフォンス エモリエント フィニッシング フルイド</h3>
         <div class="summary">2026年10月2日発売。みずみずしさとしっとり感を両立する美容乳液。100mL。</div>
         <div class="links" aria-label="SUQQU の商品リンク">
         <a href="https://hb.afl.rakuten.co.jp/hgc/g00u4tbo.d8j0m18b.g00u4tbo.d8j0n844/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Frareu%2F20260924006%2F&amp;m=http%3A%2F%2Fm.rakuten.co.jp%2Frareu%2Fi%2F10020809%2F&amp;rafcid=wsc_i_is_33e3424f-baf1-40a2-b1e6-af7fc689f141" target="_blank" rel="sponsored nofollow noopener">楽天｜アクフォンス エモリエント フィニッシング フルイド 100mL</a>
         </div>
       </article>
-      <article class="product">
+      <article class="product" data-publish-date="2026-10-02" data-week-start="2026-09-28">
         <div class="product-visual"><img src="product-2026-10-02-jillstuart-nectar-peach.webp" alt="ネクターピーチ オードトワレの公式商品画像" loading="lazy"></div>
-        <div class="date">10/2分 ｜ 10月2日発売</div>
+        <div class="date">10/2投稿 ｜ 10月2日発売</div>
         <h3>ジルスチュアート ネクターピーチ オードトワレ</h3>
         <div class="summary">2026年10月2日発売。桃から花、ムスクとハニーへ移る香り。50mLの数量限定品。</div>
         <div class="links" aria-label="ジルスチュアート の商品リンク">
@@ -74,9 +101,9 @@
         <a class="secondary" href="https://link.amazon/B07VIVpyl" target="_blank" rel="sponsored nofollow noopener">Amazonで見る</a>
         </div>
       </article>
-      <article class="product">
+      <article class="product" data-publish-date="2026-10-01" data-week-start="2026-09-28">
         <div class="product-visual"><img src="product-2026-10-01-perfectone-calming-mask.png" alt="パーフェクトワンフォーカス VCチャージ カーミングマスクの公式商品画像" loading="lazy"></div>
-        <div class="date">10/1分 ｜ 10月1日本発売</div>
+        <div class="date">10/1投稿 ｜ 10月1日本発売</div>
         <h3>パーフェクトワンフォーカス VCチャージ カーミングマスク</h3>
         <div class="summary">10月1日本発売。さっぱりした使い心地と約5分のケア。7枚入り（130mL）、メーカー希望価格880円（税込）。</div>
         <div class="links" aria-label="パーフェクトワンフォーカス の商品リンク">
@@ -84,9 +111,9 @@
         <a class="secondary" href="https://link.amazon/B0gThuaRI" target="_blank" rel="sponsored nofollow noopener">Amazonで見る</a>
         </div>
       </article>
-      <article class="product">
+      <article class="product" data-publish-date="2026-09-30" data-week-start="2026-09-28">
         <div class="product-visual"><img src="product-2026-09-30-wonjungyo-candy-glow-tint.png" alt="Wonjungyo キャンディーグロウティント限定103・104の公式商品画像" loading="lazy"></div>
-        <div class="date">9/30分 ｜ 9月30日発売</div>
+        <div class="date">9/30投稿 ｜ 9月30日発売</div>
         <h3>Wonjungyo キャンディーグロウティント</h3>
         <div class="summary">9月30日発売。103はコーラルピンク、104はローズレッド。各2.7g、メーカー希望小売価格1,540円（税込）。</div>
         <div class="links" aria-label="Wonjungyo の商品リンク">
@@ -94,9 +121,9 @@
         <a class="secondary" href="https://link.amazon/B09as4F2D" target="_blank" rel="sponsored nofollow noopener">Amazon｜103を見る</a>
         </div>
       </article>
-      <article class="product">
+      <article class="product" hidden data-publish-date="2026-09-25" data-week-start="2026-09-21">
         <div class="product-visual"><img src="product-2026-09-25-media-cream-foundation-s.png" alt="media クリームファンデーションSの商品本体とパッケージ" loading="lazy"></div>
-        <div class="date">9/25分 ｜ 2026年9月26日 発売</div>
+        <div class="date">9/25投稿 ｜ 2026年9月26日 発売</div>
         <h3>media クリームファンデーションS</h3>
         <div class="summary">2026年9月26日発売。全5色、25g、メーカー希望小売価格 各1,540円（税込）。</div>
         <div class="links" aria-label="media の商品リンク">
@@ -107,9 +134,9 @@
         <a href="https://hb.afl.rakuten.co.jp/hgc/g00qawwo.d8j0m2f9.g00qawwo.d8j0n1e2/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fcosmecomonline%2F1000236570%2F&amp;m=http%3A%2F%2Fm.rakuten.co.jp%2Fcosmecomonline%2Fi%2F10182251%2F&amp;rafcid=wsc_i_is_33e3424f-baf1-40a2-b1e6-af7fc689f141" target="_blank" rel="sponsored nofollow noopener">楽天｜OC-E1 濃いめ</a>
         </div>
       </article>
-      <article class="product">
+      <article class="product" hidden data-publish-date="2026-09-24" data-week-start="2026-09-21">
         <div class="product-visual"><img src="product-2026-09-24-kiss-4d-lip-07.png" alt="KiSS 4Dリップ新色07・08・09の公式商品画像" loading="lazy"></div>
-        <div class="date">9/24分 ｜ 2026年9月25日 発売</div>
+        <div class="date">9/24投稿 ｜ 2026年9月25日 発売</div>
         <h3>KiSS 4Dリップ 新色07・08・09</h3>
         <div class="summary">2026年9月25日発売。新色3色、3.8g、税込1,540円。</div>
         <div class="links" aria-label="KiSS の商品リンク">
@@ -122,5 +149,83 @@
     </section>
     <footer>商品情報・価格・販売状況は変更されることがあります。リンク先の表示をご確認のうえご利用ください。<br>美容予報</footer>
   </main>
+  <script>
+    (() => {
+      const cards = [...document.querySelectorAll('.product[data-publish-date][data-week-start]')];
+      if (!cards.length) return;
+      const panel = document.getElementById('calendar-panel');
+      const grid = document.getElementById('calendar-grid');
+      const monthLabel = document.getElementById('calendar-month');
+      const selectionLabel = document.getElementById('calendar-selection');
+      const prev = document.getElementById('calendar-prev');
+      const next = document.getElementById('calendar-next');
+      const parseDate = value => {
+        const [year, month, day] = value.split('-').map(Number);
+        return new Date(year, month - 1, day);
+      };
+      const isoDate = date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      const monthDay = date => `${date.getMonth() + 1}月${date.getDate()}日`;
+      const postDates = new Set(cards.map(card => card.dataset.publishDate));
+      const availableWeeks = new Set(cards.map(card => card.dataset.weekStart));
+      const dates = cards.map(card => parseDate(card.dataset.publishDate)).sort((a, b) => a - b);
+      const firstMonth = new Date(dates[0].getFullYear(), dates[0].getMonth(), 1);
+      const lastMonth = new Date(dates.at(-1).getFullYear(), dates.at(-1).getMonth(), 1);
+      let shownMonth = new Date(lastMonth);
+      let selectedWeek = cards.find(card => !card.hidden)?.dataset.weekStart || cards[0].dataset.weekStart;
+      const weekStart = date => {
+        const start = new Date(date);
+        start.setDate(start.getDate() - (start.getDay() + 6) % 7);
+        return isoDate(start);
+      };
+      const monthIndex = date => date.getFullYear() * 12 + date.getMonth();
+
+      function selectWeek(value) {
+        selectedWeek = value;
+        cards.forEach(card => { card.hidden = card.dataset.weekStart !== value; });
+        const start = parseDate(value);
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        selectionLabel.textContent = `${monthDay(start)}〜${monthDay(end)}の投稿`;
+        renderCalendar();
+      }
+
+      function renderCalendar() {
+        monthLabel.textContent = `${shownMonth.getFullYear()}年${shownMonth.getMonth() + 1}月`;
+        prev.disabled = monthIndex(shownMonth) <= monthIndex(firstMonth);
+        next.disabled = monthIndex(shownMonth) >= monthIndex(lastMonth);
+        grid.replaceChildren();
+        for (const label of ['月', '火', '水', '木', '金', '土', '日']) {
+          const head = document.createElement('span');
+          head.className = 'calendar-weekday';
+          head.textContent = label;
+          grid.append(head);
+        }
+        const firstDay = new Date(shownMonth);
+        const offset = (firstDay.getDay() + 6) % 7;
+        for (let i = 0; i < offset; i++) grid.append(document.createElement('span'));
+        const days = new Date(shownMonth.getFullYear(), shownMonth.getMonth() + 1, 0).getDate();
+        for (let day = 1; day <= days; day++) {
+          const date = new Date(shownMonth.getFullYear(), shownMonth.getMonth(), day);
+          const dateString = isoDate(date);
+          const week = weekStart(date);
+          const button = document.createElement('button');
+          button.className = 'calendar-day';
+          button.type = 'button';
+          button.textContent = String(day);
+          button.disabled = !availableWeeks.has(week);
+          button.dataset.hasPost = String(postDates.has(dateString));
+          button.setAttribute('aria-pressed', String(week === selectedWeek));
+          button.setAttribute('aria-label', `${monthDay(date)}の週の商品リンク`);
+          button.addEventListener('click', () => selectWeek(week));
+          grid.append(button);
+        }
+      }
+
+      prev.addEventListener('click', () => { shownMonth.setMonth(shownMonth.getMonth() - 1); renderCalendar(); });
+      next.addEventListener('click', () => { shownMonth.setMonth(shownMonth.getMonth() + 1); renderCalendar(); });
+      panel.hidden = false;
+      selectWeek(selectedWeek);
+    })();
+  </script>
 </body>
 </html>

@@ -45,7 +45,37 @@
     .calendar-day[aria-pressed="true"]::after { background:#fff; }
     .calendar-day:focus-visible, .calendar-nav:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
     .calendar-selection { margin:12px 0 0; color:var(--muted); font-size:.78rem; line-height:1.5; }
-    @media (min-width:1200px) { .calendar-panel { position:absolute; top:174px; left:calc(100% + 28px); width:248px; margin:0; } }
+    [hidden] { display:none !important; }
+    .video-tabs { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin:20px 0 0; padding:5px; border:1px solid var(--line); border-radius:12px; background:#fffaf5; }
+    .video-tabs button { min-height:48px; border:0; border-radius:8px; background:transparent; color:var(--muted); font:inherit; font-weight:700; cursor:pointer; }
+    .video-tabs button[aria-selected="true"] { background:var(--ink); color:#fffaf5; }
+    .video-tabs button:focus-visible, summary:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+    .calendar-nav { width:44px; height:44px; }
+    .calendar-day { aspect-ratio:auto; min-height:44px; }
+    .search-label { display:block; margin:0 0 9px; font-size:.92rem; font-weight:700; }
+    .long-search { display:block; width:100%; min-height:48px; padding:12px 14px; border:1px solid var(--line); border-radius:10px; color:var(--ink); background:#fffaf5; font:inherit; font-size:1rem; }
+    .long-search::placeholder { color:var(--muted); opacity:1; }
+    .long-heading { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; margin:24px 0 12px; }
+    .long-heading h2 { margin:0; }
+    .search-status { font-size:.8rem; color:var(--muted); }
+    .long-video { border:1px solid var(--line); border-radius:14px; background:#fffaf5; margin:12px 0; overflow:hidden; }
+    .long-video summary { display:flex; align-items:center; gap:14px; padding:16px; list-style:none; cursor:pointer; }
+    .long-video summary::-webkit-details-marker { display:none; }
+    .video-thumbnail { width:112px; aspect-ratio:16/9; object-fit:cover; border-radius:7px; flex-shrink:0; }
+    .video-title { flex:1; min-width:0; }
+    .video-title strong { display:block; font-size:1rem; line-height:1.5; overflow-wrap:anywhere; }
+    .video-title small { display:block; color:var(--muted); font-size:.78rem; margin-top:5px; }
+    .video-chevron { font-size:1.1rem; }
+    .long-video[open] .video-chevron { transform:rotate(180deg); }
+    .long-products { padding:0 16px; border-top:1px solid var(--line); }
+    .long-product { display:grid; grid-template-columns:76px minmax(0,1fr); gap:14px; padding:18px 0; }
+    .long-product + .long-product { border-top:1px solid var(--line); }
+    .long-product .product-visual { height:92px; padding:7px; margin:0; border-radius:8px; }
+    .long-brand { color:var(--coral); font-size:.78rem; font-weight:700; }
+    .long-product h3 { font-size:.94rem; line-height:1.5; margin:5px 0; overflow-wrap:anywhere; }
+    .long-product .summary { font-size:.8rem; line-height:1.65; margin:7px 0 10px; }
+    .long-product .links a { padding:10px 12px; font-size:.78rem; }
+    @media(max-width:480px) { .long-video summary { padding:12px; gap:10px; } .video-thumbnail { width:86px; } .long-products { padding:0 12px; } .long-product { grid-template-columns:60px minmax(0,1fr); gap:10px; } .links a { min-height:44px; } }
     footer { margin-top:30px; padding-top:14px; border-top:1px solid var(--line); color:var(--muted); font-size:.75rem; line-height:1.7; }
   </style>
 </head>
@@ -59,7 +89,12 @@
       <h1>紹介した新作</h1>
       <p class="intro">動画で紹介したスキンケア・コスメの情報と商品リンクをまとめています。</p>
     </header>
+    <nav class="video-tabs" role="tablist" aria-label="動画の種類">
+      <button id="short-tab" type="button" role="tab" aria-controls="short-panel" aria-selected="true">ショート動画</button>
+      <button id="long-tab" type="button" role="tab" aria-controls="long-panel" aria-selected="false">長尺動画</button>
+    </nav>
     <p class="disclosure">広告・アフィリエイトリンクを含みます。</p>
+    <div id="short-panel" role="tabpanel" aria-labelledby="short-tab">
     <aside class="calendar-panel" aria-label="投稿カレンダー" id="calendar-panel" hidden>
       <p class="calendar-heading">投稿カレンダー</p>
       <div class="calendar-controls">
@@ -72,6 +107,7 @@
     </aside>
     <section aria-labelledby="list-title">
       <h2 id="list-title">商品リンク</h2>
+      <p class="empty" id="month-empty" hidden>この月の掲載商品はありません。</p>
             <article class="product" data-publish-date="2026-10-07" data-week-start="2026-10-05">
         <div class="product-visual"><img src="商品画像_2026-10-07_タングルティーザー_ケアブラシ.png" alt="ザ・コンプリート ケアブラシの商品画像" loading="lazy"></div>
         <div class="date">10/7投稿 ｜ 10月8日一般発売</div>
@@ -179,10 +215,76 @@ Amazon：税込8,800円（10月6日確認）。</div>
       </article>
       
     </section>
+    </div>
+    <section id="long-panel" role="tabpanel" aria-labelledby="long-tab" hidden>
+      <label class="search-label" for="long-search">長尺動画で紹介した商品を探す</label>
+      <input class="long-search" type="search" id="long-search" placeholder="動画タイトル・商品名・ブランド名" autocomplete="off">
+      <div class="long-heading"><h2>動画別の商品リンク</h2><span class="search-status" id="search-status" aria-live="polite"></span></div>
+      <div id="long-video-list"></div>
+      <p class="empty" id="long-empty">長尺動画の商品リンクは準備中です。</p>
+      <p class="empty" id="search-empty" hidden>該当する商品が見つかりません。別の商品名やブランド名でお試しください。</p>
+    </section>
     <footer>商品情報・価格・販売状況は変更されることがあります。リンク先の表示をご確認のうえご利用ください。<br>美容予報</footer>
   </main>
   <script>
     (() => {
+      const tabs = [...document.querySelectorAll('.video-tabs button')];
+      const longVideos = [...document.querySelectorAll('.long-video')];
+      const search = document.getElementById('long-search');
+      const status = document.getElementById('search-status');
+      const searchEmpty = document.getElementById('search-empty');
+      const params = new URLSearchParams(location.search);
+      const requestedVideo = params.get('video');
+      const normalize = value => value.normalize('NFKC').toLowerCase().replace(/[\s・･.「」]/g, '');
+      function setTab(value, updateUrl = true) {
+        const long = value === 'long';
+        tabs.forEach(tab => tab.setAttribute('aria-selected', String(tab.id === (long ? 'long-tab' : 'short-tab'))));
+        document.getElementById('short-panel').hidden = long;
+        document.getElementById('long-panel').hidden = !long;
+        if (updateUrl) {
+          const url = new URL(location.href);
+          if (long) url.searchParams.set('view','long');
+          else { url.searchParams.delete('view');url.searchParams.delete('video'); }
+          history.replaceState(null,'',url);
+        }
+      }
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => setTab(tab.id === 'long-tab' ? 'long' : 'short'));
+        tab.addEventListener('keydown', event => {
+          if (!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+          event.preventDefault();
+          const target = event.key === 'Home' ? tabs[0] : event.key === 'End' ? tabs[1] : tabs[tab === tabs[0] ? 1 : 0];
+          target.focus();setTab(target.id === 'long-tab' ? 'long' : 'short');
+        });
+      });
+      function filterVideos() {
+        const query = normalize(search.value.trim());
+        let videoCount=0,productCount=0;
+        longVideos.forEach(video => {
+          const titleMatch = query && normalize(video.dataset.search || '').includes(query);
+          let matches=0;
+          video.querySelectorAll('.long-product').forEach(product => {
+            const match = !query || titleMatch || normalize(product.dataset.search || '').includes(query);
+            product.hidden = !match;if(match) matches++;
+          });
+          video.hidden = matches === 0;
+          if(matches) {videoCount++;productCount+=matches;}
+          if(query && matches) video.open = true;
+          video.querySelector('[data-product-count]').textContent = matches + '点';
+        });
+        status.textContent = longVideos.length ? (query ? `${videoCount}本の動画に ${productCount}件` : `${longVideos.length}本の動画`) : '';
+        searchEmpty.hidden = !longVideos.length || videoCount>0;
+      }
+      search.addEventListener('input', filterVideos);
+      longVideos.forEach(video => video.addEventListener('toggle', () => {
+        if(!video.open || video.hidden || document.getElementById('long-panel').hidden) return;
+        const url=new URL(location.href);url.searchParams.set('view','long');url.searchParams.set('video',video.id);history.replaceState(null,'',url);
+      }));
+      const targetVideo=longVideos.find(video => video.id===requestedVideo);
+      if(targetVideo) {longVideos.forEach(video => video.open=video===targetVideo);}
+      setTab(params.get('view')==='long'||targetVideo ? 'long':'short',false);
+      filterVideos();
+      if(targetVideo) requestAnimationFrame(()=>targetVideo.scrollIntoView({block:'start'}));
       const cards = [...document.querySelectorAll('.product[data-publish-date][data-week-start]')];
       if (!cards.length) return;
       const panel = document.getElementById('calendar-panel');
@@ -200,7 +302,6 @@ Amazon：税込8,800円（10月6日確認）。</div>
       const postDates = new Set(cards.map(card => card.dataset.publishDate));
       const availableWeeks = new Set(cards.map(card => card.dataset.weekStart));
       const dates = cards.map(card => parseDate(card.dataset.publishDate)).sort((a, b) => a - b);
-      const firstMonth = new Date(dates[0].getFullYear(), dates[0].getMonth(), 1);
       const lastMonth = new Date(dates.at(-1).getFullYear(), dates.at(-1).getMonth(), 1);
       let shownMonth = new Date(lastMonth);
       let selectedWeek = cards.find(card => !card.hidden)?.dataset.weekStart || cards[0].dataset.weekStart;
@@ -209,11 +310,12 @@ Amazon：税込8,800円（10月6日確認）。</div>
         start.setDate(start.getDate() - (start.getDay() + 6) % 7);
         return isoDate(start);
       };
-      const monthIndex = date => date.getFullYear() * 12 + date.getMonth();
 
       function selectWeek(value) {
         selectedWeek = value;
         cards.forEach(card => { card.hidden = card.dataset.weekStart !== value; });
+        document.getElementById('month-empty').hidden = Boolean(value);
+        if (!value) { selectionLabel.textContent = '';renderCalendar();return; }
         const start = parseDate(value);
         const end = new Date(start);
         end.setDate(start.getDate() + 6);
@@ -223,8 +325,6 @@ Amazon：税込8,800円（10月6日確認）。</div>
 
       function renderCalendar() {
         monthLabel.textContent = `${shownMonth.getFullYear()}年${shownMonth.getMonth() + 1}月`;
-        prev.disabled = monthIndex(shownMonth) <= monthIndex(firstMonth);
-        next.disabled = monthIndex(shownMonth) >= monthIndex(lastMonth);
         grid.replaceChildren();
         for (const label of ['月', '火', '水', '木', '金', '土', '日']) {
           const head = document.createElement('span');
@@ -251,10 +351,16 @@ Amazon：税込8,800円（10月6日確認）。</div>
           button.addEventListener('click', () => selectWeek(week));
           grid.append(button);
         }
+        for(let i=0;i<(7-(offset+days)%7)%7;i++) grid.append(document.createElement('span'));
       }
 
-      prev.addEventListener('click', () => { shownMonth.setMonth(shownMonth.getMonth() - 1); renderCalendar(); });
-      next.addEventListener('click', () => { shownMonth.setMonth(shownMonth.getMonth() + 1); renderCalendar(); });
+      function changeMonth(delta) {
+        shownMonth.setMonth(shownMonth.getMonth()+delta);
+        const match=cards.find(card=>card.dataset.publishDate.slice(0,7)===isoDate(shownMonth).slice(0,7));
+        selectWeek(match ? match.dataset.weekStart : null);
+      }
+      prev.addEventListener('click', () => changeMonth(-1));
+      next.addEventListener('click', () => changeMonth(1));
       panel.hidden = false;
       selectWeek(selectedWeek);
     })();
